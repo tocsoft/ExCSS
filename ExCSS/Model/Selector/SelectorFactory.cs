@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Globalization;
 using ExCSS.Model;
 using ExCSS.Model.TextBlocks;
@@ -10,7 +11,7 @@ namespace ExCSS
     {
         private SelectorOperation _selectorOperation;
         private BaseSelector _currentSelector;
-        private AggregateSelectorList _aggregateSelectorList;
+        private SelectorList _aggregateSelectorList;
         private ComplexSelector _complexSelector;
         private bool _hasCombinator;
         private Combinator _combinator;
@@ -34,7 +35,7 @@ namespace ExCSS
 
             if (_aggregateSelectorList == null || _aggregateSelectorList.Length == 0)
             {
-                return _currentSelector ?? SimpleSelector.All;
+                return _currentSelector ?? UniveralSelector.Instance;
             }
 
             if (_currentSelector == null && _aggregateSelectorList.Length == 1)
@@ -133,12 +134,13 @@ namespace ExCSS
 
                 // ID #I
                 case GrammarSegment.Hash:
-                    Insert(SimpleSelector.Id(((SymbolBlock)token).Value));
+                    Insert(new IdSelector(((SymbolBlock)token).Value));
                     return;
 
                 // Type E
                 case GrammarSegment.Ident:
-                    Insert(SimpleSelector.Type(((SymbolBlock)token).Value));
+                    //this feels a little dirt
+                    InsertElementWithOptionalClasses(((SymbolBlock)token).Value);
                     return;
 
                 // Whitespace
@@ -153,6 +155,17 @@ namespace ExCSS
                 case GrammarSegment.Comma:
                     InsertCommaDelimited();
                     return;
+            }
+        }
+
+        private void InsertElementWithOptionalClasses(string value)
+        {
+            var parts = value.Split('.');
+            Insert(new ElementSelector(parts.First()));
+
+            foreach (var c in parts.Skip(1))
+            {
+                Insert(new ClassSelector(c));
             }
         }
 
@@ -250,35 +263,35 @@ namespace ExCSS
             switch (_attributeOperator)
             {
                 case "=":
-                    Insert(SimpleSelector.AttributeMatch(_attributeName, _attributeValue));
+                    Insert(new AttributeSelector(_attributeName, AttributeOperator.Match, _attributeValue));
                     break;
 
                 case "~=":
-                    Insert(SimpleSelector.AttributeSpaceSeparated(_attributeName, _attributeValue));
+                    Insert(new AttributeSelector(_attributeName, AttributeOperator.SpaceSeparated, _attributeValue));
                     break;
 
                 case "|=":
-                    Insert(SimpleSelector.AttributeDashSeparated(_attributeName, _attributeValue));
+                    Insert(new AttributeSelector(_attributeName, AttributeOperator.DashSeparated, _attributeValue));
                     break;
 
                 case "^=":
-                    Insert(SimpleSelector.AttributeStartsWith(_attributeName, _attributeValue));
+                    Insert(new AttributeSelector(_attributeName, AttributeOperator.StartsWith, _attributeValue));
                     break;
 
                 case "$=":
-                    Insert(SimpleSelector.AttributeEndsWith(_attributeName, _attributeValue));
+                    Insert(new AttributeSelector(_attributeName, AttributeOperator.EndsWith, _attributeValue));
                     break;
 
                 case "*=":
-                    Insert(SimpleSelector.AttributeContains(_attributeName, _attributeValue));
+                    Insert(new AttributeSelector(_attributeName, AttributeOperator.Contains, _attributeValue));
                     break;
 
                 case "!=":
-                    Insert(SimpleSelector.AttributeNegatedMatch(_attributeName, _attributeValue));
+                    Insert(new AttributeSelector(_attributeName, AttributeOperator.NegatedMatch, _attributeValue));
                     break;
 
                 default:
-                    Insert(SimpleSelector.AttributeUnmatched(_attributeName));
+                    Insert(new AttributeSelector(_attributeName));
                     break;
             }
         }
@@ -327,27 +340,27 @@ namespace ExCSS
             switch (data)
             {
                 case PseudoSelectorPrefix.PseudoElementBefore:
-                    Insert(SimpleSelector.PseudoElement(PseudoSelectorPrefix.PseudoElementBefore));
+                    Insert(new PseudoElementSelector(PseudoSelectorPrefix.PseudoElementBefore));
                     break;
 
                 case PseudoSelectorPrefix.PseudoElementAfter:
-                    Insert(SimpleSelector.PseudoElement(PseudoSelectorPrefix.PseudoElementAfter));
+                    Insert(new PseudoElementSelector(PseudoSelectorPrefix.PseudoElementAfter));
                     break;
 
                 case PseudoSelectorPrefix.PseudoElementSelection:
-                    Insert(SimpleSelector.PseudoElement(PseudoSelectorPrefix.PseudoElementSelection));
+                    Insert(new PseudoElementSelector(PseudoSelectorPrefix.PseudoElementSelection));
                     break;
 
                 case PseudoSelectorPrefix.PseudoElementFirstline:
-                    Insert(SimpleSelector.PseudoElement(PseudoSelectorPrefix.PseudoElementFirstline));
+                    Insert(new PseudoElementSelector(PseudoSelectorPrefix.PseudoElementFirstline));
                     break;
 
                 case PseudoSelectorPrefix.PseudoElementFirstletter:
-                    Insert(SimpleSelector.PseudoElement(PseudoSelectorPrefix.PseudoElementFirstletter));
+                    Insert(new PseudoElementSelector(PseudoSelectorPrefix.PseudoElementFirstletter));
                     break;
 
                 default:
-                    Insert(SimpleSelector.PseudoElement(data));
+                    Insert(new PseudoElementSelector(data));
                     break;
             }
         }
@@ -358,7 +371,7 @@ namespace ExCSS
 
             if (token.GrammarSegment == GrammarSegment.Ident)
             {
-                Insert(SimpleSelector.Class(((SymbolBlock)token).Value));
+                Insert(new ClassSelector(((SymbolBlock)token).Value));
             }
         }
 
@@ -466,46 +479,24 @@ namespace ExCSS
             switch (_attributeName)
             {
                 case PseudoSelectorPrefix.PseudoFunctionNthchild:
-                    Insert(GetChildSelector<NthFirstChildSelector>());
-                    break;
-
                 case PseudoSelectorPrefix.PseudoFunctionNthlastchild:
-                    Insert(GetChildSelector<NthLastChildSelector>());
-                    break;
-
                 case PseudoSelectorPrefix.PseudoFunctionNthOfType:
-                    Insert(GetChildSelector<NthOfTypeSelector>());
-                    break;
-
                 case PseudoSelectorPrefix.PseudoFunctionNthLastOfType:
-                    Insert(GetChildSelector<NthLastOfTypeSelector>());
+                    Insert(GetNthChildSelector());
+                    break;
+                case PseudoSelectorPrefix.PseudoFunctionNot:
+                    Insert(new PseudoNotFunctionSelector(_nestedSelectorFactory.GetSelector()));
                     break;
 
-                case PseudoSelectorPrefix.PseudoFunctionNot:
-                    {
-                        var selector = _nestedSelectorFactory.GetSelector();
-                        var code = string.Format("{0}({1})", PseudoSelectorPrefix.PseudoFunctionNot, selector);
-                        Insert(SimpleSelector.PseudoClass(code));
-                        break;
-                    }
                 case PseudoSelectorPrefix.PseudoFunctionDir:
-                    {
-                        var code = string.Format("{0}({1})", PseudoSelectorPrefix.PseudoFunctionDir, _attributeValue);
-                        Insert(SimpleSelector.PseudoClass(code));
-                        break;
-                    }
+                    Insert(new PseudoFunctionSelector(PseudoSelectorPrefix.PseudoFunctionDir, _attributeValue));
+                    break;
                 case PseudoSelectorPrefix.PseudoFunctionLang:
-                    {
-                        var code = string.Format("{0}({1})", PseudoSelectorPrefix.PseudoFunctionLang, _attributeValue);
-                        Insert(SimpleSelector.PseudoClass(code));
-                        break;
-                    }
+                    Insert(new PseudoFunctionSelector(PseudoSelectorPrefix.PseudoFunctionLang, _attributeValue));
+                    break;
                 case PseudoSelectorPrefix.PseudoFunctionContains:
-                    {
-                        var code = string.Format("{0}({1})", PseudoSelectorPrefix.PseudoFunctionContains, _attributeValue);
-                        Insert(SimpleSelector.PseudoClass(code));
-                        break;
-                    }
+                    Insert(new PseudoFunctionSelector(PseudoSelectorPrefix.PseudoFunctionContains, _attributeValue));
+                    break;
             }
         }
 
@@ -518,7 +509,7 @@ namespace ExCSS
 
             if (_aggregateSelectorList == null)
             {
-                _aggregateSelectorList = new AggregateSelectorList(",");
+                _aggregateSelectorList = new MultipleSelectorList();
             }
 
             if (_complexSelector != null)
@@ -545,7 +536,7 @@ namespace ExCSS
 
                     if (compound == null)
                     {
-                        compound = new AggregateSelectorList("");
+                        compound = new AggregateSelectorList();
                         compound.AppendSelector(_currentSelector);
                     }
 
@@ -570,7 +561,7 @@ namespace ExCSS
                 if (_currentSelector == null && _complexSelector == null && _combinator == Combinator.Namespace)
                 {
                     _complexSelector = new ComplexSelector();
-                    _complexSelector.AppendSelector(SimpleSelector.Type(""), _combinator);
+                    _complexSelector.AppendSelector(EmptySelector.Instance, _combinator);
                     _currentSelector = selector;
                 }
                 else
@@ -613,7 +604,7 @@ namespace ExCSS
                     return;
 
                 case Specification.Asterisk:
-                    Insert(SimpleSelector.All);
+                    Insert(UniveralSelector.Instance);
                     return;
 
                 case Specification.Period:
@@ -626,29 +617,27 @@ namespace ExCSS
             }
         }
 
-        private BaseSelector GetChildSelector<T>() where T : NthChildSelector, new()
+
+        private BaseSelector GetNthChildSelector()
         {
-            var selector = new T();
+            int offset = 0;
+            int step = 0;
 
             if (_attributeValue.Equals(PseudoSelectorPrefix.NthChildOdd, StringComparison.OrdinalIgnoreCase))
             {
-                selector.Step = 2;
-                selector.Offset = 1;
-                selector.FunctionText = PseudoSelectorPrefix.NthChildOdd;
+                return NthChildOddSelector.Instance;
             }
             else if (_attributeValue.Equals(PseudoSelectorPrefix.NthChildEven, StringComparison.OrdinalIgnoreCase))
             {
-                selector.Step = 2;
-                selector.Offset = 0;
-                selector.FunctionText = PseudoSelectorPrefix.NthChildEven;
+                return NthChildEvenSelector.Instance;
             }
-            else if (!int.TryParse(_attributeValue, out selector.Offset))
+            else if (!int.TryParse(_attributeValue, out offset))
             {
                 var index = _attributeValue.IndexOf(PseudoSelectorPrefix.NthChildN, StringComparison.OrdinalIgnoreCase);
 
                 if (_attributeValue.Length <= 0 || index == -1)
                 {
-                    return selector;
+                    return GetNthChildSelector(0, 0);
                 }
 
                 var first = _attributeValue.Substring(0, index).Replace(" ", "");
@@ -662,36 +651,55 @@ namespace ExCSS
 
                 if (first == string.Empty || (first.Length == 1 && first[0] == Specification.PlusSign))
                 {
-                    selector.Step = 1;
+                    step = 1;
                 }
                 else if (first.Length == 1 && first[0] == Specification.MinusSign)
                 {
-                    selector.Step = -1;
+                    step = -1;
                 }
                 else
                 {
-                    int step;
-                    if (int.TryParse(first, out step))
+                    int _step;
+                    if (int.TryParse(first, out _step))
                     {
-                        selector.Step = step;
+                        step = _step;
                     }
                 }
 
                 if (second == string.Empty)
                 {
-                    selector.Offset = 0;
+                    offset = 0;
                 }
                 else
                 {
-                    int offset;
-                    if (int.TryParse(second, out offset))
+                    int _offset;
+                    if (int.TryParse(second, out _offset))
                     {
-                        selector.Offset = offset;
+                        offset = _offset;
                     }
                 }
             }
 
-            return selector;
+            return GetNthChildSelector(step, offset);
+        }
+
+        private BaseSelector GetNthChildSelector(int step, int offset)
+        {
+            switch (_attributeName)
+            {
+                case PseudoSelectorPrefix.PseudoFunctionNthchild:
+                    return new NthFirstChildSelector(step, offset);
+
+                case PseudoSelectorPrefix.PseudoFunctionNthlastchild:
+                    return new NthLastChildSelector(step, offset);
+
+                case PseudoSelectorPrefix.PseudoFunctionNthOfType:
+                    return new NthOfTypeSelector(step, offset);
+
+                case PseudoSelectorPrefix.PseudoFunctionNthLastOfType:
+                    return new NthLastOfTypeSelector(step, offset);
+            }
+            return new NthFirstChildSelector(step, offset);
         }
 
         private static BaseSelector GetPseudoSelector(Block token)
@@ -699,19 +707,19 @@ namespace ExCSS
             switch (((SymbolBlock)token).Value)
             {
                 case PseudoSelectorPrefix.PseudoRoot:
-                    return SimpleSelector.PseudoClass(PseudoSelectorPrefix.PseudoRoot);
+                    return new PseudoClassSelector(PseudoSelectorPrefix.PseudoRoot);
 
                 case PseudoSelectorPrefix.PseudoFirstOfType:
-                    return SimpleSelector.PseudoClass(PseudoSelectorPrefix.PseudoFirstOfType);
+                    return new PseudoClassSelector(PseudoSelectorPrefix.PseudoFirstOfType);
 
                 case PseudoSelectorPrefix.PseudoLastoftype:
-                    return SimpleSelector.PseudoClass(PseudoSelectorPrefix.PseudoLastoftype);
+                    return new PseudoClassSelector(PseudoSelectorPrefix.PseudoLastoftype);
 
                 case PseudoSelectorPrefix.PseudoOnlychild:
-                    return SimpleSelector.PseudoClass(PseudoSelectorPrefix.PseudoOnlychild);
+                    return new PseudoClassSelector(PseudoSelectorPrefix.PseudoOnlychild);
 
                 case PseudoSelectorPrefix.PseudoOnlyOfType:
-                    return SimpleSelector.PseudoClass(PseudoSelectorPrefix.PseudoOnlyOfType);
+                    return new PseudoClassSelector(PseudoSelectorPrefix.PseudoOnlyOfType);
 
                 case PseudoSelectorPrefix.PseudoFirstchild:
                     return FirstChildSelector.Instance;
@@ -720,82 +728,82 @@ namespace ExCSS
                     return LastChildSelector.Instance;
 
                 case PseudoSelectorPrefix.PseudoEmpty:
-                    return SimpleSelector.PseudoClass(PseudoSelectorPrefix.PseudoEmpty);
+                    return new PseudoClassSelector(PseudoSelectorPrefix.PseudoEmpty);
 
                 case PseudoSelectorPrefix.PseudoLink:
-                    return SimpleSelector.PseudoClass(PseudoSelectorPrefix.PseudoLink);
+                    return new PseudoClassSelector(PseudoSelectorPrefix.PseudoLink);
 
                 case PseudoSelectorPrefix.PseudoVisited:
-                    return SimpleSelector.PseudoClass(PseudoSelectorPrefix.PseudoVisited);
+                    return new PseudoClassSelector(PseudoSelectorPrefix.PseudoVisited);
 
                 case PseudoSelectorPrefix.PseudoActive:
-                    return SimpleSelector.PseudoClass(PseudoSelectorPrefix.PseudoActive);
+                    return new PseudoClassSelector(PseudoSelectorPrefix.PseudoActive);
 
                 case PseudoSelectorPrefix.PseudoHover:
-                    return SimpleSelector.PseudoClass(PseudoSelectorPrefix.PseudoHover);
+                    return new PseudoClassSelector(PseudoSelectorPrefix.PseudoHover);
 
                 case PseudoSelectorPrefix.PseudoFocus:
-                    return SimpleSelector.PseudoClass(PseudoSelectorPrefix.PseudoFocus);
+                    return new PseudoClassSelector(PseudoSelectorPrefix.PseudoFocus);
 
                 case PseudoSelectorPrefix.PseudoTarget:
-                    return SimpleSelector.PseudoClass(PseudoSelectorPrefix.PseudoTarget);
+                    return new PseudoClassSelector(PseudoSelectorPrefix.PseudoTarget);
 
                 case PseudoSelectorPrefix.PseudoEnabled:
-                    return SimpleSelector.PseudoClass(PseudoSelectorPrefix.PseudoEnabled);
+                    return new PseudoClassSelector(PseudoSelectorPrefix.PseudoEnabled);
 
                 case PseudoSelectorPrefix.PseudoDisabled:
-                    return SimpleSelector.PseudoClass(PseudoSelectorPrefix.PseudoDisabled);
+                    return new PseudoClassSelector(PseudoSelectorPrefix.PseudoDisabled);
 
                 case PseudoSelectorPrefix.PseudoDefault:
-                    return SimpleSelector.PseudoClass(PseudoSelectorPrefix.PseudoDefault);
+                    return new PseudoClassSelector(PseudoSelectorPrefix.PseudoDefault);
 
                 case PseudoSelectorPrefix.PseudoChecked:
-                    return SimpleSelector.PseudoClass(PseudoSelectorPrefix.PseudoChecked);
+                    return new PseudoClassSelector(PseudoSelectorPrefix.PseudoChecked);
 
                 case PseudoSelectorPrefix.PseudoIndeterminate:
-                    return SimpleSelector.PseudoClass(PseudoSelectorPrefix.PseudoIndeterminate);
+                    return new PseudoClassSelector(PseudoSelectorPrefix.PseudoIndeterminate);
 
                 case PseudoSelectorPrefix.PseudoUnchecked:
-                    return SimpleSelector.PseudoClass(PseudoSelectorPrefix.PseudoUnchecked);
+                    return new PseudoClassSelector(PseudoSelectorPrefix.PseudoUnchecked);
 
                 case PseudoSelectorPrefix.PseudoValid:
-                    return SimpleSelector.PseudoClass(PseudoSelectorPrefix.PseudoValid);
+                    return new PseudoClassSelector(PseudoSelectorPrefix.PseudoValid);
 
                 case PseudoSelectorPrefix.PseudoInvalid:
-                    return SimpleSelector.PseudoClass(PseudoSelectorPrefix.PseudoInvalid);
+                    return new PseudoClassSelector(PseudoSelectorPrefix.PseudoInvalid);
 
                 case PseudoSelectorPrefix.PseudoRequired:
-                    return SimpleSelector.PseudoClass(PseudoSelectorPrefix.PseudoRequired);
+                    return new PseudoClassSelector(PseudoSelectorPrefix.PseudoRequired);
 
                 case PseudoSelectorPrefix.PseudoReadonly:
-                    return SimpleSelector.PseudoClass(PseudoSelectorPrefix.PseudoReadonly);
+                    return new PseudoClassSelector(PseudoSelectorPrefix.PseudoReadonly);
 
                 case PseudoSelectorPrefix.PseudoReadwrite:
-                    return SimpleSelector.PseudoClass(PseudoSelectorPrefix.PseudoReadwrite);
+                    return new PseudoClassSelector(PseudoSelectorPrefix.PseudoReadwrite);
 
                 case PseudoSelectorPrefix.PseudoInrange:
-                    return SimpleSelector.PseudoClass(PseudoSelectorPrefix.PseudoInrange);
+                    return new PseudoClassSelector(PseudoSelectorPrefix.PseudoInrange);
 
                 case PseudoSelectorPrefix.PseudoOutofrange:
-                    return SimpleSelector.PseudoClass(PseudoSelectorPrefix.PseudoOutofrange);
+                    return new PseudoClassSelector(PseudoSelectorPrefix.PseudoOutofrange);
 
                 case PseudoSelectorPrefix.PseudoOptional:
-                    return SimpleSelector.PseudoClass(PseudoSelectorPrefix.PseudoOptional);
+                    return new PseudoClassSelector(PseudoSelectorPrefix.PseudoOptional);
 
                 case PseudoSelectorPrefix.PseudoElementBefore:
-                    return SimpleSelector.PseudoClass(PseudoSelectorPrefix.PseudoElementBefore);
+                    return new PseudoClassSelector(PseudoSelectorPrefix.PseudoElementBefore);
 
                 case PseudoSelectorPrefix.PseudoElementAfter:
-                    return SimpleSelector.PseudoClass(PseudoSelectorPrefix.PseudoElementAfter);
+                    return new PseudoClassSelector(PseudoSelectorPrefix.PseudoElementAfter);
 
                 case PseudoSelectorPrefix.PseudoElementFirstline:
-                    return SimpleSelector.PseudoClass(PseudoSelectorPrefix.PseudoElementFirstline);
+                    return new PseudoClassSelector(PseudoSelectorPrefix.PseudoElementFirstline);
 
                 case PseudoSelectorPrefix.PseudoElementFirstletter:
-                    return SimpleSelector.PseudoClass(PseudoSelectorPrefix.PseudoElementFirstletter);
+                    return new PseudoClassSelector(PseudoSelectorPrefix.PseudoElementFirstletter);
 
                 default:
-                    return SimpleSelector.PseudoClass(token.ToString());
+                    return new PseudoClassSelector(token.ToString());
             }
         }
     }

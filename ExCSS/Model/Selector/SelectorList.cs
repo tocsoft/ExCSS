@@ -13,9 +13,9 @@ namespace ExCSS
             Selectors = new List<BaseSelector>();
         }
 
-        public int Length 
+        public int Length
         {
-            get { return Selectors.Count; } 
+            get { return Selectors.Count; }
         }
 
         public BaseSelector this[int index]
@@ -30,7 +30,7 @@ namespace ExCSS
             return this;
         }
 
-        public SelectorList RemoveSelector(SimpleSelector selector)
+        public SelectorList RemoveSelector(BaseSelector selector)
         {
             Selectors.Remove(selector);
             return this;

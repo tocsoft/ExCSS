@@ -1,9 +1,9 @@
 ﻿// ReSharper disable once CheckNamespace
 namespace ExCSS
 {
-    internal sealed class LastChildSelector : BaseSelector, IToString
+    internal sealed class LastChildSelector : BasePseudoSelector, IToString
     {
-        LastChildSelector()
+        LastChildSelector() : base(PseudoSelectorPrefix.PseudoLastchild)
         { }
 
         static LastChildSelector _instance;
@@ -11,11 +11,6 @@ namespace ExCSS
         public static LastChildSelector Instance
         {
             get { return _instance ?? (_instance = new LastChildSelector()); }
-        }
-
-        public override string ToString(bool friendlyFormat, int indentation = 0)
-        {
-            return ":" + PseudoSelectorPrefix.PseudoLastchild;
         }
     }
 }

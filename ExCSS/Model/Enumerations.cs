@@ -93,6 +93,18 @@ namespace ExCSS
         Namespace
     }
 
+    public enum AttributeOperator
+    {
+        Unmatched,
+        Match,
+        NegatedMatch,
+        SpaceSeparated,
+        StartsWith,
+        EndsWith,
+        Contains,
+        DashSeparated
+    }
+
     internal enum GrammarSegment
     {
         String,

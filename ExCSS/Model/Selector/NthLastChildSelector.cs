@@ -3,11 +3,8 @@
 // ReSharper disable once CheckNamespace
 namespace ExCSS
 {
-    internal sealed class NthLastChildSelector : NthChildSelector, IToString
+    public sealed class NthLastChildSelector : NthChildSelector, IToString
     {
-        public override string ToString(bool friendlyFormat, int indentation = 0)
-        {
-            return FormatSelector(PseudoSelectorPrefix.PseudoFunctionNthlastchild);
-        }
+        public NthLastChildSelector(int step, int offset) : base(PseudoSelectorPrefix.PseudoFunctionNthlastchild, step, offset) { }
     }
 }

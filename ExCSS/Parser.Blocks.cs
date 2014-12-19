@@ -744,7 +744,7 @@ namespace ExCSS
 
             if (token.GrammarSegment == GrammarSegment.Ident)
             {
-                CastRuleSet<PageRule>().Selector = new SimpleSelector(token.ToString());
+                CastRuleSet<PageRule>().Selector = new UnknownSelector(token.ToString());
                 return true;
             }
 

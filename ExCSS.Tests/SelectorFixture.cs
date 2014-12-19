@@ -57,7 +57,7 @@ namespace ExCSS.Tests
             var rules = css.Rules;
 
             Assert.AreEqual(".one,.two{}", rules[0].ToString());
-            var selector = (rules[0] as StyleRule).Selector as AggregateSelectorList;
+            var selector = (rules[0] as StyleRule).Selector as MultipleSelectorList;
             Assert.AreEqual(2, selector.Length);
             Assert.AreEqual(".one", selector[0].ToString());
             Assert.AreEqual(".two", selector[1].ToString());

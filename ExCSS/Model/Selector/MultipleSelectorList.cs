@@ -5,20 +5,6 @@ namespace ExCSS
 {
     public class MultipleSelectorList : SelectorList, IToString
     {
-        internal static MultipleSelectorList Create(params SimpleSelector[] selectors)
-        {
-            var multiple = new MultipleSelectorList();
-
-            foreach (var selector in selectors)
-            {
-                multiple.Selectors.Add(selector);
-            }
-
-            return multiple;
-        }
-
-        internal bool IsInvalid { get; set; }
-
         public override string ToString(bool friendlyFormat, int indentation = 0)
         {
             var builder = new StringBuilder();
