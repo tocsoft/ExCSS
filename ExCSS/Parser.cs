@@ -13,6 +13,13 @@ namespace ExCSS
 
     public sealed partial class Parser
     {
+        public static StyleSheet Parse(string css)
+        {
+            var p = new Parser();
+            return p.ParseInternal(css);
+        }
+        private Parser() { }
+
         private SelectorFactory _selectorFactory;
         private Stack<FunctionBuffer> _functionBuffers;
         private Lexer _lexer;
@@ -24,8 +31,9 @@ namespace ExCSS
         private StringBuilder _buffer;
         private ParsingContext _parsingContext;
 
-        public StyleSheet Parse(string css)
+        private StyleSheet ParseInternal(string css)
         {
+
             _selectorFactory = new SelectorFactory();
             _functionBuffers = new Stack<FunctionBuffer>();
             _styleSheet = new StyleSheet();
@@ -73,12 +81,12 @@ namespace ExCSS
         internal static RuleSet ParseRule(string css)
         {
             var parser = new Parser();
-            
 
-            var styleSheet = parser.Parse(css);
+
+            var styleSheet = parser.ParseInternal(css);
 
             return styleSheet.Rules.Count > 0
-                ? styleSheet.Rules[0] 
+                ? styleSheet.Rules[0]
                 : null;
         }
 
@@ -93,12 +101,12 @@ namespace ExCSS
         internal static void AppendDeclarations(StyleDeclaration list, string css, bool quirksMode = false)
         {
             var parser = new Parser();//(new StyleSheet(), new StylesheetReader(declarations))
-           
+
 
             parser.AddRuleSet(list.ParentRule ?? new StyleRule(list));
 
             parser._parsingContext = ParsingContext.InDeclaration;
-            parser.Parse(css);
+            parser.ParseInternal(css);
         }
 
         internal void HandleLexerError(ParserError error, string message)

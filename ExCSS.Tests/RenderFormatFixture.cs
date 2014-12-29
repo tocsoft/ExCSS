@@ -10,9 +10,8 @@ namespace ExCSS.Tests
         [Test]
         public void Stylesheet_Renders_Inline()
         {
-            var parser = new Parser();
        
-            var css = parser.Parse(Resources.Css3);
+            var css = Parser.Parse(Resources.Css3);
 
             Assert.AreEqual(Resources.Css3Min, css.ToString());
         }
@@ -20,8 +19,7 @@ namespace ExCSS.Tests
         [Test]
         public void Stylesheet_Renders_Friendly_Format()
         {
-            var parser = new Parser();
-            var css = parser.Parse(Resources.Css3);
+            var css = Parser.Parse(Resources.Css3);
 
             Assert.AreEqual(Resources.Css3Friendly, css.ToString(true));
         }

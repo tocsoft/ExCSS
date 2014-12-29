@@ -8,7 +8,7 @@ namespace ExCSS.Tests
         [Test]
         public void Lexer_Handles_Double_Quote_New_Line()
         {
-            var stylesheet = new Parser().Parse("@import \"\r\n");
+            var stylesheet = Parser.Parse("@import \"\r\n");
 
             Assert.AreEqual(1, stylesheet.Errors.Count);
             Assert.AreEqual(ParserError.UnexpectedLineBreak, stylesheet.Errors[0].ParserError);
@@ -20,7 +20,7 @@ namespace ExCSS.Tests
         [Test]
         public void Lexer_Handles_Single_Quote_New_Line()
         {
-            var stylesheet = new Parser().Parse("@import '\r\n");
+            var stylesheet = Parser.Parse("@import '\r\n");
 
             Assert.AreEqual(1, stylesheet.Errors.Count);
             Assert.AreEqual(ParserError.UnexpectedLineBreak, stylesheet.Errors[0].ParserError);
@@ -32,7 +32,7 @@ namespace ExCSS.Tests
         [Test]
         public void Lexer_Handles_Double_Quote_Backslash()
         {
-            var stylesheet = new Parser().Parse("@import \\");
+            var stylesheet = Parser.Parse("@import \\");
 
             Assert.AreEqual(2, stylesheet.Errors.Count);
             Assert.AreEqual(ParserError.EndOfFile, stylesheet.Errors[0].ParserError);
@@ -44,7 +44,7 @@ namespace ExCSS.Tests
         [Test]
         public void Lexer_Handles_Single_Quote_Backslash()
         {
-            var stylesheet = new Parser().Parse("@import '\\");
+            var stylesheet = Parser.Parse("@import '\\");
 
             Assert.AreEqual(1, stylesheet.Errors.Count);
             Assert.AreEqual(ParserError.EndOfFile, stylesheet.Errors[0].ParserError);
@@ -56,7 +56,7 @@ namespace ExCSS.Tests
         [Test]
         public void Lexer_Handles_Backslash_Newline()
         {
-            var stylesheet = new Parser().Parse("@import \\\r\n");
+            var stylesheet = Parser.Parse("@import \\\r\n");
 
             Assert.AreEqual(2, stylesheet.Errors.Count);
             Assert.AreEqual(ParserError.UnexpectedLineBreak, stylesheet.Errors[0].ParserError);
@@ -68,7 +68,7 @@ namespace ExCSS.Tests
         [Test]
         public void Lexer_Handles_URL_EoF()
         {
-            var stylesheet = new Parser().Parse(".class{ prop: url(");
+            var stylesheet = Parser.Parse(".class{ prop: url(");
 
             Assert.AreEqual(1, stylesheet.Errors.Count);
             Assert.AreEqual(ParserError.EndOfFile, stylesheet.Errors[0].ParserError);
@@ -80,7 +80,7 @@ namespace ExCSS.Tests
         [Test]
         public void Lexer_Handles_URL_New_Line()
         {
-            var stylesheet = new Parser().Parse(".class{ prop: url(\"\r\n}");
+            var stylesheet = Parser.Parse(".class{ prop: url(\"\r\n}");
 
             Assert.AreEqual(2, stylesheet.Errors.Count);
             Assert.AreEqual(ParserError.UnexpectedLineBreak, stylesheet.Errors[0].ParserError);
@@ -97,7 +97,7 @@ namespace ExCSS.Tests
         [Test]
         public void Lexer_Handles_URL_Backslash_EoF()
         {
-            var stylesheet = new Parser().Parse(".class{ prop: url(\"\\");
+            var stylesheet = Parser.Parse(".class{ prop: url(\"\\");
 
             Assert.AreEqual(3, stylesheet.Errors.Count);
             Assert.AreEqual(ParserError.EndOfFile, stylesheet.Errors[0].ParserError);
@@ -114,7 +114,7 @@ namespace ExCSS.Tests
         [Test]
         public void Lexer_Handles_URL_Single_Quote_New_Line()
         {
-            var stylesheet = new Parser().Parse(".class{ prop: url('\r\n");
+            var stylesheet = Parser.Parse(".class{ prop: url('\r\n");
 
             Assert.AreEqual(2, stylesheet.Errors.Count);
             Assert.AreEqual(ParserError.UnexpectedLineBreak, stylesheet.Errors[0].ParserError);
@@ -129,7 +129,7 @@ namespace ExCSS.Tests
         [Test]
         public void Lexer_Handles_URL_Single_Quote_Backslash_EOF()
         {
-            var stylesheet = new Parser().Parse(".class{ prop: url('\\");
+            var stylesheet = Parser.Parse(".class{ prop: url('\\");
 
             Assert.AreEqual(3, stylesheet.Errors.Count);
             Assert.AreEqual(ParserError.EndOfFile, stylesheet.Errors[0].ParserError);
@@ -144,7 +144,7 @@ namespace ExCSS.Tests
         [Test]
         public void Lexer_Handles_Url_Unquoted()
         {
-            var stylesheet = new Parser().Parse(".class{url(test')}");
+            var stylesheet = Parser.Parse(".class{url(test')}");
 
             Assert.AreEqual(2, stylesheet.Errors.Count);
             Assert.AreEqual(ParserError.InvalidCharacter, stylesheet.Errors[0].ParserError);
@@ -161,7 +161,7 @@ namespace ExCSS.Tests
         [Test]
         public void Lexer_Handles_Post_URL_Errant_Character()
         {
-            var stylesheet = new Parser().Parse(".class{ prop: url('a'-");
+            var stylesheet = Parser.Parse(".class{ prop: url('a'-");
 
             Assert.AreEqual(2, stylesheet.Errors.Count);
             Assert.AreEqual(ParserError.InvalidCharacter, stylesheet.Errors[0].ParserError);
@@ -173,7 +173,7 @@ namespace ExCSS.Tests
         [Test]
         public void Lexer_Handles_Hash_Backslash()
         {
-            var stylesheet = new Parser().Parse("n#\\");
+            var stylesheet = Parser.Parse("n#\\");
 
             Assert.AreEqual(1, stylesheet.Errors.Count);
             Assert.AreEqual(ParserError.InvalidCharacter, stylesheet.Errors[0].ParserError);
@@ -185,7 +185,7 @@ namespace ExCSS.Tests
         [Test]
         public void Lexer_Handles_Numeric_Backslash()
         {
-            var stylesheet = new Parser().Parse("#a\\");
+            var stylesheet = Parser.Parse("#a\\");
 
             Assert.AreEqual(2, stylesheet.Errors.Count);
             Assert.AreEqual(ParserError.InvalidCharacter, stylesheet.Errors[0].ParserError);
@@ -202,7 +202,7 @@ namespace ExCSS.Tests
         [Test]
         public void Lexer_Handles_Double_Quotes_Backslash()
         {
-            var stylesheet = new Parser().Parse(".calss{a: \"\\");
+            var stylesheet = Parser.Parse(".calss{a: \"\\");
 
             Assert.AreEqual(1, stylesheet.Errors.Count);
             Assert.AreEqual(ParserError.EndOfFile, stylesheet.Errors[0].ParserError);
@@ -216,7 +216,7 @@ namespace ExCSS.Tests
         {
             Assert.DoesNotThrow(() =>
             {
-                var stylesheet = new Parser().Parse(".foo{clear:;}");
+                var stylesheet = Parser.Parse(".foo{clear:;}");
                 Assert.AreEqual(1, stylesheet.Errors.Count);
                 Assert.AreEqual(".foo{clear:;}", stylesheet.ToString());
             });
@@ -227,7 +227,7 @@ namespace ExCSS.Tests
         {
             Assert.DoesNotThrow(() =>
             {
-                var stylesheet = new Parser().Parse(@".accordion-a {background-color: #c6c6c6; !important;}");
+                var stylesheet = Parser.Parse(@".accordion-a {background-color: #c6c6c6; !important;}");
                 Assert.IsTrue(stylesheet.Errors.Count > 0);
             });
         }

@@ -10,8 +10,7 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Character_Sets_Symbols()
         {
-            var parser = new Parser();
-            var css = parser.Parse("@charset 'utf-8';");
+            var css = Parser.Parse("@charset 'utf-8';");
 
             var charset = css.CharsetDirectives;
 
@@ -21,13 +20,12 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Character_Sets_Strings()
         {
-            var parser = new Parser();
-            var css = parser.Parse("@charset 'utf-8';");
+            var css = Parser.Parse("@charset 'utf-8';");
             var charset = css.CharsetDirectives;
 
             Assert.AreEqual("@charset 'utf-8';", charset[0].ToString());
 
-            css = parser.Parse("@charset \"utf-8\";");
+            css = Parser.Parse("@charset \"utf-8\";");
             charset = css.CharsetDirectives;
 
             Assert.AreEqual("@charset 'utf-8';", charset[0].ToString());
@@ -38,8 +36,7 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Imports_Double_Quoted()
         {
-            var parser = new Parser();
-            var css = parser.Parse("@import \"style.css\";");
+            var css = Parser.Parse("@import \"style.css\";");
 
             var imports = css.ImportDirectives;
 
@@ -49,8 +46,7 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Imports_URL_Double_Quoted()
         {
-            var parser = new Parser();
-            var css = parser.Parse("@import url(\"style.css\");");
+            var css = Parser.Parse("@import url(\"style.css\");");
 
             var imports = css.ImportDirectives;
 
@@ -61,8 +57,7 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Imports_With_Single_Media()
         {
-            var parser = new Parser();
-            var css = parser.Parse("@import url(\"style.css\") print;");
+            var css = Parser.Parse("@import url(\"style.css\") print;");
 
             var imports = css.ImportDirectives;
 
@@ -72,8 +67,7 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Imports_With_Multiple_Media()
         {
-            var parser = new Parser();
-            var css = parser.Parse("@import url(\"style.css\") projection, tv;");
+            var css = Parser.Parse("@import url(\"style.css\") projection, tv;");
 
             var imports = css.ImportDirectives;
 
@@ -83,8 +77,7 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Imports_With_Constraints()
         {
-            var parser = new Parser();
-            var css = parser.Parse("@import url('style.css') handheld and (max-width: 400px);");
+            var css = Parser.Parse("@import url('style.css') handheld and (max-width: 400px);");
 
             var imports = css.ImportDirectives;
 
@@ -94,8 +87,7 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Imports_With_Plain_And_Quoted_Meida()
         {
-            var parser = new Parser();
-            var css = parser.Parse("@import url(style.css) screen \"Plain style\";");
+            var css = Parser.Parse("@import url(style.css) screen \"Plain style\";");
 
             var imports = css.ImportDirectives;
 
@@ -105,8 +97,7 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Imports_With_Quoted_Media_And_Delimiters()
         {
-            var parser = new Parser();
-            var css = parser.Parse("@import url(style.css) \"Four-columns and dark\";");
+            var css = Parser.Parse("@import url(style.css) \"Four-columns and dark\";");
 
             var imports = css.ImportDirectives;
 
@@ -116,8 +107,7 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Imports_With_Quoted_URL_And_Media()
         {
-            var parser = new Parser();
-            var css = parser.Parse("@import \"style.css\" \"Style Sheet\";");
+            var css = Parser.Parse("@import \"style.css\" \"Style Sheet\";");
 
             var imports = css.ImportDirectives;
 
@@ -129,8 +119,7 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Fontface()
         {
-            var parser = new Parser();
-            var css = parser.Parse(
+            var css = Parser.Parse(
 @"@font-face
 {
     font-family: testFont;
@@ -149,8 +138,7 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Keyframes()
         {
-            var parser = new Parser();
-            var css = parser.Parse("@keyframes test-keyframes{from {top:0px;} to {top:200px;}}");
+            var css = Parser.Parse("@keyframes test-keyframes{from {top:0px;} to {top:200px;}}");
 
             var keyframes = css.KeyframeDirectives;
 
@@ -160,23 +148,20 @@ namespace ExCSS.Tests
         [Test]
         public void KeyFrames_ToString_Test()
         {
-            var parser = new Parser();
             Assert.AreEqual("@keyframes ixp-bounce{0%,100%{transform:translateY(0);}}",
-                parser.Parse("@keyframes ixp-bounce { 0%, 100% { transform: translateY(0);}}").ToString());
+                Parser.Parse("@keyframes ixp-bounce { 0%, 100% { transform: translateY(0);}}").ToString());
         }
 
         [Test]
         public void KeyFrames_ToString_With_Vendor_Prefix_Test()
         {
-            var parser = new Parser();
             Assert.AreEqual("@-moz-keyframes ixp-bounce{0%,100%{transform:translateY(0);}}",
-                parser.Parse("@-moz-keyframes ixp-bounce { 0%, 100% { transform: translateY(0);}}").ToString());
+                Parser.Parse("@-moz-keyframes ixp-bounce { 0%, 100% { transform: translateY(0);}}").ToString());
         }
 
         [Test]
         public void KeyFrames_Multi_Test()
         {
-            var parser = new Parser();
             var css = @"
             @-moz-keyframes ixp-tada {
                 0% {transform: scale(111);}
@@ -189,7 +174,7 @@ namespace ExCSS.Tests
             }
             ";
 
-            var result = parser.Parse(css).ToString();
+            var result = Parser.Parse(css).ToString();
             Console.WriteLine(result);
             Assert.That(result.Contains("@keyframes ixp-tada"));
             Assert.AreEqual(@"@-moz-keyframes ixp-tada{0%{transform:scale(111);}10%,20%{transform:scale(222) rotate(-3deg);}100%{transform:scale(333) rotate(0);}}@keyframes ixp-tada{0%{transform:scale(666);}100%{transform:scale(1) rotate(777);}}", result);
@@ -198,11 +183,10 @@ namespace ExCSS.Tests
         [Test]
         public void KeyFrames_Browser_Prefix_Works_Test()
         {
-            var parser = new Parser();
             StyleSheet result = null;
             Assert.DoesNotThrow(() =>
             {
-                result = parser.Parse(@"@-webkit-keyframes ixp-bounce { 100% { -webkit-transform: translateY(0); } }");
+                result = Parser.Parse(@"@-webkit-keyframes ixp-bounce { 100% { -webkit-transform: translateY(0); } }");
             });
             Assert.That(result.ToString(), Is.StringContaining("transform"));
 
@@ -214,8 +198,7 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Media_Queries()
         {
-            var parser = new Parser();
-            var css = parser.Parse("@media print {body { font-size: 12pt; } h1 { font-size: 24pt; }}");
+            var css = Parser.Parse("@media print {body { font-size: 12pt; } h1 { font-size: 24pt; }}");
 
             var media = css.MediaDirectives;
 
@@ -228,8 +211,7 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Page_Directives()
         {
-            var parser = new Parser();
-            var css = parser.Parse("@page {size: auto;margin: 10%;}");
+            var css = Parser.Parse("@page {size: auto;margin: 10%;}");
 
             var pages = css.PageDirectives;
 
@@ -239,8 +221,7 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Page_Directives_With_Pseudo()
         {
-            var parser = new Parser();
-            var css = parser.Parse("@page :left {size: auto;margin: 10%;}");
+            var css = Parser.Parse("@page :left {size: auto;margin: 10%;}");
 
             var pages = css.PageDirectives;
 
@@ -253,8 +234,7 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Supports_Directives()
         {
-            var parser = new Parser();
-            var css = parser.Parse("@supports (animation-name: test){h2 {top: 0px;float: none;}}");
+            var css = Parser.Parse("@supports (animation-name: test){h2 {top: 0px;float: none;}}");
 
             var supports = css.SupportsDirectives;
 
@@ -266,8 +246,7 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Namespace_Directives_With_Prefix()
         {
-            var parser = new Parser();
-            var css = parser.Parse("@namespace toto \"http://toto.example.org\";");
+            var css = Parser.Parse("@namespace toto \"http://toto.example.org\";");
 
             var namespaces = css.NamespaceDirectives;
 
@@ -277,8 +256,7 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Namespace_Directives()
         {
-            var parser = new Parser();
-            var css = parser.Parse("@namespace \"http://toto.example.org\";");
+            var css = Parser.Parse("@namespace \"http://toto.example.org\";");
 
             var namespaces = css.NamespaceDirectives;
 

@@ -9,8 +9,7 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Hex_Color()
         {
-            var parser = new Parser();
-            var css = parser.Parse("html{color:#000000;}");
+            var css = Parser.Parse("html{color:#000000;}");
 
             Assert.AreEqual("html{color:#000;}", css.ToString(false));
         }
@@ -18,8 +17,7 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Important_Flag()
         {
-            var parser = new Parser();
-            var css = parser.Parse("table.fullWidth {width: 100% !important;}");
+            var css = Parser.Parse("table.fullWidth {width: 100% !important;}");
 
             var rules = css.Rules;
 
@@ -29,8 +27,8 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Global_Selectors()
         {
-            var parser = new Parser();
-            var css = parser.Parse("*{}");
+            
+            var css = Parser.Parse("*{}");
 
             var rules = css.Rules;
 
@@ -40,8 +38,8 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Mixed_Selectors()
         {
-            var parser = new Parser();
-            var css = parser.Parse("button,.button,input[type=button]{}");
+            
+            var css = Parser.Parse("button,.button,input[type=button]{}");
 
             var rules = css.Rules;
 
@@ -51,8 +49,8 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Class_Selectors()
         {
-            var parser = new Parser();
-            var css = parser.Parse(".one, .two{}");
+            
+            var css = Parser.Parse(".one, .two{}");
 
             var rules = css.Rules;
 
@@ -66,8 +64,8 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Element_Selectors()
         {
-            var parser = new Parser();
-            var css = parser.Parse("E{}");
+            
+            var css = Parser.Parse("E{}");
 
             var rules = css.Rules;
 
@@ -77,8 +75,8 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Empty_Attribute_Element_Selectors()
         {
-            var parser = new Parser();
-            var css = parser.Parse("E[foo]{}");
+            
+            var css = Parser.Parse("E[foo]{}");
 
             var rules = css.Rules;
 
@@ -88,8 +86,8 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Quoted_Attribute_Element_Selectors()
         {
-            var parser = new Parser();
-            var css = parser.Parse("E[foo=\"bar\"]{}");
+            
+            var css = Parser.Parse("E[foo=\"bar\"]{}");
 
             var rules = css.Rules;
 
@@ -99,8 +97,8 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Space_Separated_Attribute()
         {
-            var parser = new Parser();
-            var css = parser.Parse("E[foo~=\"bar\"]{}");
+            
+            var css = Parser.Parse("E[foo~=\"bar\"]{}");
 
             var rules = css.Rules;
 
@@ -110,8 +108,8 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Starts_With_Attribute()
         {
-            var parser = new Parser();
-            var css = parser.Parse("E[foo^=\"bar\"]{}");
+            
+            var css = Parser.Parse("E[foo^=\"bar\"]{}");
 
             var rules = css.Rules;
 
@@ -121,8 +119,8 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Ends_With_Attribute()
         {
-            var parser = new Parser();
-            var css = parser.Parse("E[foo$=\"bar\"]{}");
+            
+            var css = Parser.Parse("E[foo$=\"bar\"]{}");
 
             var rules = css.Rules;
 
@@ -132,8 +130,8 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Contains_Attribute()
         {
-            var parser = new Parser();
-            var css = parser.Parse("E[foo*=\"bar\"]{}");
+            
+            var css = Parser.Parse("E[foo*=\"bar\"]{}");
 
             var rules = css.Rules;
 
@@ -143,8 +141,8 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Dash_Attribute()
         {
-            var parser = new Parser();
-            var css = parser.Parse("E[foo|=\"bar\"]{}");
+            
+            var css = Parser.Parse("E[foo|=\"bar\"]{}");
 
             var rules = css.Rules;
 
@@ -154,8 +152,8 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Multiple_Attribute()
         {
-            var parser = new Parser();
-            var css = parser.Parse("E[foo=\"bar\"][rel=\"important\"]{}");
+            
+            var css = Parser.Parse("E[foo=\"bar\"][rel=\"important\"]{}");
 
             var rules = css.Rules;
 
@@ -165,8 +163,8 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Pseudo_Selectors()
         {
-            var parser = new Parser();
-            var css = parser.Parse("E:pseudo{}");
+            
+            var css = Parser.Parse("E:pseudo{}");
 
             var rules = css.Rules;
 
@@ -176,8 +174,8 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Pseudo_Functions()
         {
-            var parser = new Parser();
-            var css = parser.Parse("E:nth-child(n){}");
+            
+            var css = Parser.Parse("E:nth-child(n){}");
 
             var rules = css.Rules;
 
@@ -187,8 +185,8 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Pseudo_Functions_With_Negative_Rules()
         {
-            var parser = new Parser();
-            var css = parser.Parse("E:nth-last-of-type(-n+2){}");
+            
+            var css = Parser.Parse("E:nth-last-of-type(-n+2){}");
 
             var rules = css.Rules;
 
@@ -198,8 +196,8 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Pseudo_Element()
         {
-            var parser = new Parser();
-            var css = parser.Parse("E::first-line{}");
+            
+            var css = Parser.Parse("E::first-line{}");
 
             var rules = css.Rules;
 
@@ -209,8 +207,8 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Class_Attributed_Elements()
         {
-            var parser = new Parser();
-            var css = parser.Parse("E.warning{}");
+            
+            var css = Parser.Parse("E.warning{}");
 
             var rules = css.Rules;
 
@@ -220,8 +218,8 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Id_Elements()
         {
-            var parser = new Parser();
-            var css = parser.Parse("E#id{}");
+            
+            var css = Parser.Parse("E#id{}");
 
             var rules = css.Rules;
 
@@ -231,8 +229,8 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Descendant_Elements()
         {
-            var parser = new Parser();
-            var css = parser.Parse("E F{}");
+            
+            var css = Parser.Parse("E F{}");
 
             var rules = css.Rules;
 
@@ -242,8 +240,8 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Child_Elements()
         {
-            var parser = new Parser();
-            var css = parser.Parse("E > F{}");
+            
+            var css = Parser.Parse("E > F{}");
 
             var rules = css.Rules;
 
@@ -253,8 +251,8 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Adjacent_Sibling_Elements()
         {
-            var parser = new Parser();
-            var css = parser.Parse("E + F{}");
+            
+            var css = Parser.Parse("E + F{}");
 
             var rules = css.Rules;
 
@@ -264,8 +262,8 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_General_Sibling_Elements()
         {
-            var parser = new Parser();
-            var css = parser.Parse("E + F{}");
+            
+            var css = Parser.Parse("E + F{}");
 
             var rules = css.Rules;
 
@@ -275,8 +273,8 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Multiple_Pseudo_Classes()
         {
-            var parser = new Parser();
-            var css = parser.Parse("E:focus:hover{}");
+            
+            var css = Parser.Parse("E:focus:hover{}");
 
             var rules = css.Rules;
 
@@ -286,8 +284,8 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Element_Class_Pseudo_Classes()
         {
-            var parser = new Parser();
-            var css = parser.Parse("E.class:hover{}");
+            
+            var css = Parser.Parse("E.class:hover{}");
 
             var rules = css.Rules;
 
@@ -297,8 +295,8 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Global_Combinator()
         {
-            var parser = new Parser();
-            var css = parser.Parse("E * p{}");
+            
+            var css = Parser.Parse("E * p{}");
 
             var rules = css.Rules;
 
@@ -308,8 +306,8 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Global_Attribute()
         {
-            var parser = new Parser();
-            var css = parser.Parse("E p *[href]{}");
+            
+            var css = Parser.Parse("E p *[href]{}");
 
             var rules = css.Rules;
 
@@ -319,8 +317,8 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Descendand_And_Child_Combinators()
         {
-            var parser = new Parser();
-            var css = parser.Parse("E F>G H{}");
+            
+            var css = Parser.Parse("E F>G H{}");
 
             var rules = css.Rules;
 
@@ -330,8 +328,8 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Classed_Element_Combinators()
         {
-            var parser = new Parser();
-            var css = parser.Parse("E.warning + h2{}");
+            
+            var css = Parser.Parse("E.warning + h2{}");
 
             var rules = css.Rules;
 
@@ -341,8 +339,8 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Descendand_And_Sibling_Combinators()
         {
-            var parser = new Parser();
-            var css = parser.Parse("E F+G{}");
+            
+            var css = Parser.Parse("E F+G{}");
 
             var rules = css.Rules;
 
@@ -352,8 +350,8 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Attributed_Descendants()
         {
-            var parser = new Parser();
-            var css = parser.Parse("E + *[REL=up]{}");
+            
+            var css = Parser.Parse("E + *[REL=up]{}");
 
             var rules = css.Rules;
 
@@ -363,8 +361,8 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Chained_Classes()
         {
-            var parser = new Parser();
-            var css = parser.Parse("E.first.second{}");
+            
+            var css = Parser.Parse("E.first.second{}");
 
             var rules = css.Rules;
 
@@ -374,8 +372,8 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Namespace_Selectors()
         {
-            var parser = new Parser();
-            var css = parser.Parse("ns|F{}");
+            
+            var css = Parser.Parse("ns|F{}");
 
             var rules = css.Rules;
 
@@ -385,8 +383,8 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Namespace_Global()
         {
-            var parser = new Parser();
-            var css = parser.Parse("ns|*{}");
+            
+            var css = Parser.Parse("ns|*{}");
 
             var rules = css.Rules;
 
@@ -396,8 +394,8 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Element_With_No_Namespace_Global()
         {
-            var parser = new Parser();
-            var css = parser.Parse("|E{}");
+            
+            var css = Parser.Parse("|E{}");
 
             var rules = css.Rules;
 
@@ -407,8 +405,8 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Element_With_Any_Namespace_Global()
         {
-            var parser = new Parser();
-            var css = parser.Parse("*|E{}");
+            
+            var css = Parser.Parse("*|E{}");
 
             var rules = css.Rules;
 
@@ -419,11 +417,11 @@ namespace ExCSS.Tests
         public void Parser_Reads_Any_Comments_Without_Errors()
         {
             var validComments = new[] {"/*/", "/**/", "/***/", "/****/", "/* anything */", "/* // */", "/*// */"};
-            var parser = new Parser();
+            
 
             foreach (var comment in validComments)
             {
-                var stylesheet = parser.Parse(comment);
+                var stylesheet = Parser.Parse(comment);
                 Assert.AreEqual(0, stylesheet.Errors.Count, string.Format("{0} is not valid", comment));
             }
         }
@@ -444,7 +442,7 @@ namespace ExCSS.Tests
                 "\r\n" +
                 "#copyright {}\r\n";
 
-            var stylesheet = new Parser().Parse(comments);
+            var stylesheet = Parser.Parse(comments);
             Assert.AreEqual(0, stylesheet.Errors.Count);
             Assert.AreEqual(3, stylesheet.Rules.Count);
             Assert.AreEqual("#sidebar{}", stylesheet.Rules[0].ToString());
@@ -455,8 +453,8 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Background_Gradients()
         {
-            var parser = new Parser();
-            var css = parser.Parse(@".bg{background:-moz-linear-gradient(top, #FFF 0, #FFF 100%) !important;}");
+            
+            var css = Parser.Parse(@".bg{background:-moz-linear-gradient(top, #FFF 0, #FFF 100%) !important;}");
 
             Assert.That(css.Errors.Count == 0);
             Assert.AreEqual(1, css.Rules.Count());
@@ -466,8 +464,8 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Background_Gradients_With_Nested_RGBA()
         {
-            var parser = new Parser();
-            var css = parser.Parse(@".bg{background: -moz-linear-gradient(left,     rgba(0, 119, 152,     1) 0%,        rgba(1,160, 155,1) 100%);}");
+            
+            var css = Parser.Parse(@".bg{background: -moz-linear-gradient(left,     rgba(0, 119, 152,     1) 0%,        rgba(1,160, 155,1) 100%);}");
             var cssResult = css.Rules[0].ToString();
 
             Assert.That(css.Errors.Count == 0);
@@ -477,8 +475,8 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Background_Gradients_Many()
         {
-            var parser = new Parser();
-            var css = parser.Parse(@".group-sticker .no-override:hover:before,
+            
+            var css = Parser.Parse(@".group-sticker .no-override:hover:before,
                     .group-sticker .no-override.on:before {
                       z-index: 2;
                       border-radius: 100%;
@@ -500,8 +498,8 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Background_Gradients_With_Legacy_Syntax()
         {
-            var parser = new Parser();
-            var css = parser.Parse(@".c{background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #9ACE48), color-stop(100%, #84B23C)) !important;}");
+            
+            var css = Parser.Parse(@".c{background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #9ACE48), color-stop(100%, #84B23C)) !important;}");
             var cssResult = css.Rules[0].ToString();
 
             Assert.That(css.Errors.Count == 0);
@@ -512,8 +510,8 @@ namespace ExCSS.Tests
         [Test]
         public void Parser_Reads_Background_Gradients_With_Nested_Fn()
         {
-            var parser = new Parser();
-            var css = parser.Parse(@".c{background:-webkit-gradient(linear, left top, left bottom, color-stop(0, #9ACE48), color-stop(100%,#84B23C)) !important;}");
+            
+            var css = Parser.Parse(@".c{background:-webkit-gradient(linear, left top, left bottom, color-stop(0, #9ACE48), color-stop(100%,#84B23C)) !important;}");
             var cssResult = css.Rules[0].ToString();
 
             Assert.That(css.Errors.Count == 0);
@@ -524,7 +522,7 @@ namespace ExCSS.Tests
         public void Parser_Reads_Microsoft_Filter_Fn()
         {
             var css = @".a{filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#f8a122',endColorstr='#f6801a',GradientType=0);}";
-            var results = new Parser().Parse(css);
+            var results = Parser.Parse(css);
             Assert.That(results.Errors.Count == 0);
             Assert.AreEqual(css, results.ToString());
         }
@@ -545,7 +543,7 @@ background: linear-gradient(to bottom,  rgba(30,87,153,1) 0%,rgba(41,137,216,1) 
 filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#1e5799', endColorstr='#7db9e8',GradientType=0 ); /* IE6-8 */
 filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#1e5799',endColorstr='#7db9e8',GradientType=0); /* IE6-8 */
 }";
-            var results = new Parser().Parse(css);
+            var results = Parser.Parse(css);
             Assert.That(results.Errors.Count == 0);
         }
     }
